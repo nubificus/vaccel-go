@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nubificus/go-vaccel/vaccel"
+	"github.com/nubificus/vaccel-go/vaccel"
 )
 
 func main() {

@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/nubificus/go-vaccel/vaccel"
+	"github.com/nubificus/vaccel-go/vaccel"
 )
 
 type MyData struct {
