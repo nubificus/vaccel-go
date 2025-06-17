@@ -32,11 +32,8 @@ func NewMyData(size uint32) unsafe.Pointer {
 
 /* Function that serializes an instance of MyData */
 func Serialize(buf unsafe.Pointer) (unsafe.Pointer, uint32) {
-
 	mydata := (*MyData)(buf)
-
 	serialBuf := make([]uint32, mydata.Size+1)
-
 	serialBuf[0] = uint32(mydata.Size)
 
 	var i uint32
@@ -53,7 +50,6 @@ func Serialize(buf unsafe.Pointer) (unsafe.Pointer, uint32) {
 
 /* Function that constructs an instance of MyData out of serialized data */
 func Deserialize(buf unsafe.Pointer) unsafe.Pointer {
-
 	sizeExtr := *((*uint32)(buf))
 
 	/* Convert unsafe.Pointer to Slice */
@@ -78,27 +74,31 @@ func Deserialize(buf unsafe.Pointer) unsafe.Pointer {
 }
 
 func main() {
+	/* Read User Args */
+	if len(os.Args) != 2 {
+		fmt.Printf("Usage: %s <shared-object>\n", os.Args[0])
+		return
+	}
 
-	/* Shared Object */
+	path := os.Args[1]
+
+	var session vaccel.Session
 	var sharedObject vaccel.Resource
 
-	err := vaccel.ResourceInit(&sharedObject, "/usr/local/lib/libmytestlib.so", vaccel.ResourceLib)
-
-	if err != 0 {
+	err := sharedObject.Init(path, vaccel.ResourceLib)
+	if err != vaccel.OK {
 		fmt.Println("error creating shared object")
 		os.Exit(int(err))
 	}
 
-	var session vaccel.Session
-
-	err = vaccel.SessionInit(&session, 0)
-	if err != 0 {
+	err = session.Init(0)
+	if err != vaccel.OK {
 		fmt.Println("error initializing session")
 		os.Exit(int(err))
 	}
 
-	err = vaccel.ResourceRegister(&sharedObject, &session)
-	if err != 0 {
+	err = session.Register(&sharedObject)
+	if err != vaccel.OK {
 		fmt.Println("error registering resource with session")
 		os.Exit(int(err))
 	}
@@ -117,7 +117,7 @@ func main() {
 	var numEntries uint32 = 5
 	myDataPtr := NewMyData(numEntries)
 
-	if read.AddNonSerialArg(myDataPtr, 0, Serialize) != 0 {
+	if read.AddNonSerialArg(myDataPtr, 0, Serialize) != vaccel.OK {
 		fmt.Println("Error Adding Non-Serialized arg")
 		os.Exit(0)
 	}
@@ -126,14 +126,14 @@ func main() {
 	var uint32Size uint32 = 4
 	expectedSize := uintptr((numEntries + 1) * uint32Size)
 
-	if write.ExpectNonSerialArg(expectedSize) != 0 {
+	if write.ExpectNonSerialArg(expectedSize) != vaccel.OK {
 		fmt.Println("Error defining expected arg")
 		os.Exit(0)
 	}
 
 	/* Run the operation */
 	err = vaccel.ExecWithResource(&session, &sharedObject, "mytestfunc_nonser", read, write)
-	if err != 0 {
+	if err != vaccel.OK {
 		fmt.Println("An error occurred while running the operation")
 		os.Exit(err)
 	}
@@ -149,20 +149,20 @@ func main() {
 	fmt.Println()
 
 	/* Delete the lists */
-	if write.Delete() != 0 || read.Delete() != 0 {
+	if write.Delete() != vaccel.OK || read.Delete() != vaccel.OK {
 		fmt.Println("An error occurred in deletion of the arg-lists")
 		os.Exit(0)
 	}
 
-	if vaccel.ResourceUnregister(&sharedObject, &session) != 0 {
+	if session.Unregister(&sharedObject) != vaccel.OK {
 		fmt.Println("An error occurred while unregistering the resource")
 	}
 
-	if vaccel.ResourceRelease(&sharedObject) != 0 {
+	if sharedObject.Release() != vaccel.OK {
 		fmt.Println("An error occurred while releasing the resource")
 	}
 
-	if vaccel.SessionRelease(&session) != 0 {
+	if session.Release() != vaccel.OK {
 		fmt.Println("An error occurred while freeing the session")
 	}
 }

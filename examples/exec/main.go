@@ -29,22 +29,21 @@ func main() {
 	}
 
 	var session vaccel.Session
-	err := vaccel.SessionInit(&session, 0)
-	if err != 0 {
+	err := session.Init(0)
+	if err != vaccel.OK {
 		fmt.Println("error initializing session")
 		os.Exit(int(err))
 	}
 
 	var res vaccel.Resource
-	err = vaccel.ResourceInit(&res, path, vaccel.ResourceLib)
-
-	if err != 0 {
+	err = res.Init(path, vaccel.ResourceLib)
+	if err != vaccel.OK {
 		fmt.Println("error creating shared object resource")
 		os.Exit(int(err))
 	}
 
-	err = vaccel.ResourceRegister(&res, &session)
-	if err != 0 {
+	err = session.Register(&res)
+	if err != vaccel.OK {
 		fmt.Println("error registering resource with session")
 		os.Exit(int(err))
 	}
@@ -60,7 +59,7 @@ func main() {
 	buf := unsafe.Pointer(&inputInt)
 	size := unsafe.Sizeof(inputInt)
 
-	if read.AddSerialArg(buf, size) != 0 {
+	if read.AddSerialArg(buf, size) != vaccel.OK {
 		fmt.Println("Error Adding Serialized arg")
 		os.Exit(0)
 	}
@@ -69,14 +68,13 @@ func main() {
 	buf = unsafe.Pointer(&output)
 	size = unsafe.Sizeof(output)
 
-	if write.ExpectSerialArg(buf, size) != 0 {
+	if write.ExpectSerialArg(buf, size) != vaccel.OK {
 		fmt.Println("Error defining expected arg")
 		os.Exit(0)
 	}
 
 	err = vaccel.ExecWithResource(&session, &res, "mytestfunc", read, write)
-
-	if err != 0 {
+	if err != vaccel.OK {
 		fmt.Println("An error occurred while running the operation")
 		os.Exit(err)
 	}
@@ -97,20 +95,20 @@ func main() {
 	val = C.uint(*cast)
 	fmt.Println("Output(3): ", val)
 
-	if write.Delete() != 0 || read.Delete() != 0 {
+	if write.Delete() != vaccel.OK || read.Delete() != vaccel.OK {
 		fmt.Println("An error occurred in deletion of the arg-lists")
 		os.Exit(0)
 	}
 
-	if vaccel.ResourceUnregister(&res, &session) != 0 {
+	if session.Unregister(&res) != vaccel.OK {
 		fmt.Println("An error occurred while unregistering the resource")
 	}
 
-	if vaccel.ResourceRelease(&res) != 0 {
+	if res.Release() != vaccel.OK {
 		fmt.Println("An error occurred while releasing the resource")
 	}
 
-	if vaccel.SessionRelease(&session) != 0 {
+	if session.Release() != vaccel.OK {
 		fmt.Println("An error occurred while releasing the session")
 	}
 }
