@@ -26,18 +26,10 @@ func (t ResourceType) ToCEnum() C.vaccel_resource_type_t {
 	return C.vaccel_resource_type_t(t)
 }
 
-func ResourceInit(res *Resource, path string, resType ResourceType) int {
-	return int(C.vaccel_resource_init(&res.cRes, C.CString(path), resType.ToCEnum())) //nolint:gocritic
+func (r *Resource) Init(path string, resType ResourceType) int {
+	return int(C.vaccel_resource_init(&r.cRes, C.CString(path), resType.ToCEnum())) //nolint:gocritic
 }
 
-func ResourceRegister(res *Resource, sess *Session) int {
-	return int(C.vaccel_resource_register(&res.cRes, &sess.cSess)) //nolint:gocritic
-}
-
-func ResourceUnregister(res *Resource, sess *Session) int {
-	return int(C.vaccel_resource_unregister(&res.cRes, &sess.cSess)) //nolint:gocritic
-}
-
-func ResourceRelease(res *Resource) int {
-	return int(C.vaccel_resource_release(&res.cRes)) //nolint:gocritic
+func (r *Resource) Release() int {
+	return int(C.vaccel_resource_release(&r.cRes)) //nolint:gocritic
 }

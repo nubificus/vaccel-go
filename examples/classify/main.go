@@ -20,19 +20,15 @@ func main() {
 
 	var session vaccel.Session
 
-	err := vaccel.SessionInit(&session, 0)
-
-	if err != 0 {
+	err := session.Init(0)
+	if err != vaccel.OK {
 		fmt.Println("error initializing session")
 		os.Exit(err)
 	}
 
 	var outText string
-
-	/* Run the Operation providing the path */
 	outText, err = vaccel.ImageClassificationFromFile(&session, path)
-
-	if err != 0 {
+	if err != vaccel.OK {
 		fmt.Println("Image Classification failed")
 		os.Exit(err)
 	}
@@ -46,15 +42,16 @@ func main() {
 	}
 
 	outText, err = vaccel.ImageClassification(&session, imageBytes)
-
-	if err != 0 {
+	if err != vaccel.OK {
 		fmt.Println("Image Classification failed")
 		os.Exit(err)
 	}
 
 	fmt.Println("Output(2): ", outText)
 
-	if vaccel.SessionRelease(&session) != 0 {
+	err = session.Release()
+	if err != vaccel.OK {
 		fmt.Println("An error occurred while freeing the session")
+		os.Exit(1)
 	}
 }
