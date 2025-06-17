@@ -17,5 +17,8 @@ exec: prepare
 nonser: prepare 
 	go build -o bin/nonser examples/nonser/main.go
 
+tf: prepare
+	go build -o bin/tf examples/tf/main.go
+
 clean:
 	rm -rf bin
