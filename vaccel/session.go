@@ -33,3 +33,11 @@ func (s *Session) Unregister(r *Resource) int {
 func (s *Session) GetId() int64 {
 	return int64(s.cSess.id)
 }
+
+func (s *Session) Update(flags uint32) int {
+	return int(C.vaccel_session_update(&s.cSess, C.uint32_t(flags)))
+}
+
+func (s *Session) GetFlags() int32 {
+	return int32(s.cSess.hint)
+}
