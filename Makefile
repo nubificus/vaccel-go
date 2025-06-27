@@ -20,5 +20,8 @@ nonser: prepare
 tf: prepare
 	go build -o bin/tf examples/tf/main.go
 
+exec_genop: prepare
+	go build -o bin/exec_genop examples/exec_genop/main.go
+
 clean:
 	rm -rf bin
