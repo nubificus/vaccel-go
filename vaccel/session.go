@@ -29,3 +29,7 @@ func (s *Session) Register(r *Resource) int {
 func (s *Session) Unregister(r *Resource) int {
 	return int(C.vaccel_resource_unregister(&r.cRes, &s.cSess)) //nolint:gocritic
 }
+
+func (s *Session) GetId() int64 {
+	return int64(s.cSess.id)
+}
