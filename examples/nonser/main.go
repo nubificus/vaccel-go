@@ -124,8 +124,7 @@ func main() {
 
 	/* Define an expected argument */
 	var uint32Size uint32 = 4
-	expectedSize := uintptr((numEntries + 1) * uint32Size)
-
+	expectedSize := int((numEntries + 1) * uint32Size)
 	if write.ExpectNonSerialArg(expectedSize) != vaccel.OK {
 		fmt.Println("Error defining expected arg")
 		os.Exit(0)
