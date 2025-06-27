@@ -13,6 +13,7 @@ import (
 )
 
 const INPUT int32 = 10
+
 func main() {
 	if len(os.Args) < 2 || len(os.Args) > 3 {
 		fmt.Printf("Usage: %s <lib_file> [iterations]\n", os.Args[0])
@@ -21,7 +22,7 @@ func main() {
 
 	libpath := os.Args[1]
 	funcname := "mytestfunc"
-	var iters int = 1
+	iters := 1
 	var e error
 	if len(os.Args) > 2 {
 		iters, e = strconv.Atoi(os.Args[2])
