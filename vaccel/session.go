@@ -30,12 +30,12 @@ func (s *Session) Unregister(r *Resource) int {
 	return int(C.vaccel_resource_unregister(&r.cRes, &s.cSess)) //nolint:gocritic
 }
 
-func (s *Session) GetId() int64 {
+func (s *Session) GetID() int64 {
 	return int64(s.cSess.id)
 }
 
 func (s *Session) Update(flags uint32) int {
-	return int(C.vaccel_session_update(&s.cSess, C.uint32_t(flags)))
+	return int(C.vaccel_session_update(&s.cSess, C.uint32_t(flags))) //nolint:gocritic
 }
 
 func (s *Session) GetFlags() int32 {

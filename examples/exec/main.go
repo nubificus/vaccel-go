@@ -22,11 +22,12 @@ func main() {
 
 	path := os.Args[1]
 	input := os.Args[2]
-
-	inputInt, e := strconv.Atoi(input)
+	inputInt64, e := strconv.Atoi(input)
 	if e != nil {
 		fmt.Println("error converting input")
+		return
 	}
+	inputInt32 := int32(inputInt64)
 
 	var session vaccel.Session
 	err := session.Init(0)
@@ -56,18 +57,14 @@ func main() {
 		os.Exit(0)
 	}
 
-	buf := unsafe.Pointer(&inputInt)
-	size := unsafe.Sizeof(inputInt)
-
-	if read.AddSerialArg(buf, size) != vaccel.OK {
+	if read.AddInt32Arg(inputInt32) != vaccel.OK {
 		fmt.Println("Error Adding Serialized arg")
 		os.Exit(0)
 	}
 
-	var output int
-	buf = unsafe.Pointer(&output)
-	size = unsafe.Sizeof(output)
-
+	var output int32
+	buf := unsafe.Pointer(&output)
+	size := int(unsafe.Sizeof(output))
 	if write.ExpectSerialArg(buf, size) != vaccel.OK {
 		fmt.Println("Error defining expected arg")
 		os.Exit(0)
