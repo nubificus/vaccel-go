@@ -15,7 +15,7 @@ const DataSize = 30
 
 func main() {
 	if len(os.Args) != 2 && len(os.Args) != 3 {
-		fmt.Printf("Usage: %s model-dir [iterations]\n", os.Args[0])
+		fmt.Printf("Usage: %s model-file [iterations]\n", os.Args[0])
 		return
 	}
 	path := os.Args[1]
@@ -34,13 +34,10 @@ func main() {
 
 	var session vaccel.Session
 	var model vaccel.Resource
-	var tfSess vaccel.TFSession
-	var status vaccel.TFStatus
-	var inNode vaccel.TFNode
-	var outNode vaccel.TFNode
-	var runOptions vaccel.TFBuffer
-	var inTensor vaccel.TFTensor
-	var inTensors []vaccel.TFTensor
+	var tfliteSess vaccel.TFLiteSession
+	var status uint8
+	var inTensor vaccel.TFLiteTensor
+	var inTensors []vaccel.TFLiteTensor
 	var dataPtr uintptr
 	var size uint
 	var err int
@@ -64,25 +61,14 @@ func main() {
 		goto ReleaseSession
 	}
 
-	tfSess = vaccel.TFSession{Sess: &session, Model: &model}
-	err = tfSess.Load(&status)
+	tfliteSess = vaccel.TFLiteSession{Sess: &session, Model: &model}
+	err = tfliteSess.Load()
 	if err != vaccel.OK {
 		fmt.Println("Could not load TF session")
 		goto UnregisterResource
 	}
 
-	err = status.Release()
-	if err != vaccel.OK {
-		fmt.Println("Could not release TF status")
-	}
-
-	err = inNode.Init("serving_default_input_1", 0)
-	if err != vaccel.OK {
-		fmt.Println("Could not initialize TF Node")
-		goto UnregisterResource
-	}
-
-	err = inTensor.Init([]int64{1, DataSize}, vaccel.TfFloat)
+	err = inTensor.Init([]int32{1, DataSize}, vaccel.TfLiteFloat32)
 	if err != vaccel.OK {
 		fmt.Println("Could not create input tensor")
 		goto DeleteTFSession
@@ -100,30 +86,17 @@ func main() {
 		goto DeleteInTensor
 	}
 
-	err = outNode.Init("StatefulPartitionedCall", 0)
-	if err != vaccel.OK {
-		fmt.Println("Cound not configure output TF Node")
-		goto DeleteInTensor
-	}
-
-	inTensors = []vaccel.TFTensor{inTensor}
+	inTensors = []vaccel.TFLiteTensor{inTensor}
 
 	for i := 0; i < iters; i++ {
-		outTensors := make([]vaccel.TFTensor, 1)
-		err = tfSess.Run(
-			&runOptions,
-			&inNode,
-			inTensors,
-			&outNode,
-			&outTensors,
-			&status,
-		)
+		outTensors := make([]vaccel.TFLiteTensor, 1)
+		err, status = tfliteSess.Run(inTensors, &outTensors)
 		if err != vaccel.OK {
 			fmt.Println("TF-Session-Run failed")
-			goto ReleaseTFStatus
+			break
 		}
 
-		fmt.Println("Success!")
+		fmt.Println("Success, TFLite status: ", status)
 		fmt.Printf("Output tensor => type:%d nr_dims:%d\n", outTensors[0].Type(),
 			outTensors[0].NrDims())
 
@@ -137,54 +110,26 @@ func main() {
 
 		if outTensors[0].Release() != vaccel.OK {
 			fmt.Println("Could not release output tensor")
-			goto ReleaseTFStatus
+			break
 		}
-
-		if i < iters-1 {
-			if status.Release() != vaccel.OK {
-				fmt.Println("Could not release session run status")
-				goto DeleteInTensor
-			}
-		}
-	}
-
-	if inNode.Release() != vaccel.OK {
-		fmt.Println("Could not release input node")
-	}
-
-	if outNode.Release() != vaccel.OK {
-		fmt.Println("Could not release output node")
-	}
-
-ReleaseTFStatus:
-	if status.Release() != vaccel.OK {
-		fmt.Println("An error occurred while releasing the status")
 	}
 
 DeleteInTensor:
 	if inTensor.Release() != vaccel.OK {
 		fmt.Println("An error occurred while releasing the tensor")
 	}
-
 DeleteTFSession:
-	if tfSess.Delete(&status) != vaccel.OK {
-		fmt.Println("An error occurred while deleting the TF session")
+	if tfliteSess.Delete() != vaccel.OK {
+		fmt.Println("An error occurred while deleting the TFLite session")
 	}
-
-	if status.Release() != vaccel.OK {
-		fmt.Println("An error occurred while releasing the status")
-	}
-
 UnregisterResource:
 	if session.Unregister(&model) != vaccel.OK {
 		fmt.Println("An error occurred while unregistering the resource")
 	}
-
 ReleaseSession:
 	if session.Release() != vaccel.OK {
 		fmt.Println("An error occurred while releasing the session")
 	}
-
 ReleaseResource:
 	if model.Release() != vaccel.OK {
 		fmt.Println("An error occurred while releasing the resource")
