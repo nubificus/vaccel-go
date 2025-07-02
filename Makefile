@@ -1,5 +1,5 @@
 .PHONY: all
-all: noop classify exec nonser
+all: noop classify exec nonser tf tflite exec_genop
 
 prepare:
 	@go mod tidy
@@ -19,6 +19,9 @@ nonser: prepare
 
 tf: prepare
 	go build -o bin/tf examples/tf/main.go
+
+tflite: prepare
+	go build -o bin/tflite examples/tflite/main.go
 
 exec_genop: prepare
 	go build -o bin/exec_genop examples/exec_genop/main.go
