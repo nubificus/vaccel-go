@@ -33,3 +33,7 @@ func (r *Resource) Init(path string, resType ResourceType) int {
 func (r *Resource) Release() int {
 	return int(C.vaccel_resource_release(&r.cRes)) //nolint:gocritic
 }
+
+func (r *Resource) GetID() int64 {
+	return int64(r.cRes.id)
+}

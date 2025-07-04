@@ -105,9 +105,10 @@ func (t *TFTensor) Init(dims []int64, dtype TFDataType) int {
 	}
 	defer C.free(unsafe.Pointer(cDims))
 
-	dimsSlice := (*[16]C.int64_t)(unsafe.Pointer(cDims))[:len(dims):len(dims)]
-	for i, d := range dims {
-		dimsSlice[i] = C.int64_t(d)
+	base := uintptr(unsafe.Pointer(cDims))
+	for i := 0; i < len(dims); i++ {
+		ptr := (*C.int64_t)(unsafe.Pointer(base + uintptr(i)*unsafe.Sizeof(C.int64_t(0))))
+		*ptr = C.int64_t(dims[i])
 	}
 
 	ret := C.vaccel_tf_tensor_init(
@@ -204,12 +205,11 @@ func (t *TFTensor) Dims() []int64 {
 	}
 
 	n := int(t.cTFTensor.nr_dims)
-	cDims := (*[16]C.int64_t)(unsafe.Pointer(t.cTFTensor.dims))[:n:n]
-
+	ptr := unsafe.Pointer(t.cTFTensor.dims)
+	cSlice := unsafe.Slice((*int64)(ptr), n)
 	dims := make([]int64, n)
-	for i := 0; i < n; i++ {
-		dims[i] = int64(cDims[i])
-	}
+	copy(dims, cSlice)
+
 	return dims
 }
 
