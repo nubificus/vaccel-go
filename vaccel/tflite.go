@@ -57,9 +57,10 @@ func (t *TFLiteTensor) Init(dims []int32, dtype TFLiteDataType) int {
 	}
 	defer C.free(unsafe.Pointer(cDims))
 
-	dimsSlice := (*[16]C.int32_t)(unsafe.Pointer(cDims))[:len(dims):len(dims)]
-	for i, d := range dims {
-		dimsSlice[i] = C.int32_t(d)
+	base := uintptr(unsafe.Pointer(cDims))
+	for i := 0; i < len(dims); i++ {
+		ptr := (*C.int32_t)(unsafe.Pointer(base + uintptr(i)*unsafe.Sizeof(C.int32_t(0))))
+		*ptr = C.int32_t(dims[i])
 	}
 
 	ret := C.vaccel_tflite_tensor_init(
@@ -156,12 +157,11 @@ func (t *TFLiteTensor) Dims() []int32 {
 	}
 
 	n := int(t.cTFLiteTensor.nr_dims)
-	cDims := (*[16]C.int32_t)(unsafe.Pointer(t.cTFLiteTensor.dims))[:n:n]
-
+	ptr := unsafe.Pointer(t.cTFLiteTensor.dims)
+	cSlice := unsafe.Slice((*int32)(ptr), n)
 	dims := make([]int32, n)
-	for i := 0; i < n; i++ {
-		dims[i] = int32(cDims[i])
-	}
+	copy(dims, cSlice)
+
 	return dims
 }
 
