@@ -34,7 +34,6 @@ func main() {
 
 	var session vaccel.Session
 	var model vaccel.Resource
-	var tfSess vaccel.TFSession
 	var status vaccel.TFStatus
 	var inNode vaccel.TFNode
 	var outNode vaccel.TFNode
@@ -64,10 +63,9 @@ func main() {
 		goto ReleaseSession
 	}
 
-	tfSess = vaccel.TFSession{Sess: &session, Model: &model}
-	err = tfSess.Load(&status)
+	err = vaccel.TFModelLoad(&session, &model, &status)
 	if err != vaccel.OK {
-		fmt.Println("Could not load TF session")
+		fmt.Println("Could not load TF Model")
 		goto UnregisterResource
 	}
 
@@ -85,7 +83,7 @@ func main() {
 	err = inTensor.Init([]int64{1, DataSize}, vaccel.TfFloat)
 	if err != vaccel.OK {
 		fmt.Println("Could not create input tensor")
-		goto DeleteTFSession
+		goto UnloadTFModel
 	}
 
 	data = make([]float32, DataSize)
@@ -110,7 +108,9 @@ func main() {
 
 	for i := 0; i < iters; i++ {
 		outTensors := make([]vaccel.TFTensor, 1)
-		err = tfSess.Run(
+		err = vaccel.TFModelRun(
+			&session,
+			&model,
 			&runOptions,
 			&inNode,
 			inTensors,
@@ -119,7 +119,7 @@ func main() {
 			&status,
 		)
 		if err != vaccel.OK {
-			fmt.Println("TF-Session-Run failed")
+			fmt.Println("TF-Model-Run failed")
 			goto ReleaseTFStatus
 		}
 
@@ -166,9 +166,9 @@ DeleteInTensor:
 		fmt.Println("An error occurred while releasing the tensor")
 	}
 
-DeleteTFSession:
-	if tfSess.Delete(&status) != vaccel.OK {
-		fmt.Println("An error occurred while deleting the TF session")
+UnloadTFModel:
+	if vaccel.TFModelUnload(&session, &model, &status) != vaccel.OK {
+		fmt.Println("An error occurred while unloading the TF model")
 	}
 
 	if status.Release() != vaccel.OK {

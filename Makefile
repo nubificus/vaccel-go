@@ -26,5 +26,8 @@ tflite: prepare
 exec_genop: prepare
 	go build -o bin/exec_genop examples/exec_genop/main.go
 
+torch:
+	go build -o bin/torch examples/torch/main.go
+
 clean:
 	rm -rf bin
