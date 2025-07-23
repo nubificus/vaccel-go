@@ -34,7 +34,6 @@ func main() {
 
 	var session vaccel.Session
 	var model vaccel.Resource
-	var tfliteSess vaccel.TFLiteSession
 	var status uint8
 	var inTensor vaccel.TFLiteTensor
 	var inTensors []vaccel.TFLiteTensor
@@ -61,17 +60,16 @@ func main() {
 		goto ReleaseSession
 	}
 
-	tfliteSess = vaccel.TFLiteSession{Sess: &session, Model: &model}
-	err = tfliteSess.Load()
+	err = vaccel.TFLiteModelLoad(&session, &model)
 	if err != vaccel.OK {
-		fmt.Println("Could not load TF session")
+		fmt.Println("Could not load TFLite Model")
 		goto UnregisterResource
 	}
 
 	err = inTensor.Init([]int32{1, DataSize}, vaccel.TfLiteFloat32)
 	if err != vaccel.OK {
 		fmt.Println("Could not create input tensor")
-		goto DeleteTFSession
+		goto UnloadTFLiteModel
 	}
 
 	data = make([]float32, DataSize)
@@ -90,7 +88,7 @@ func main() {
 
 	for i := 0; i < iters; i++ {
 		outTensors := make([]vaccel.TFLiteTensor, 1)
-		err, status = tfliteSess.Run(inTensors, &outTensors)
+		err, status = vaccel.TFLiteModelRun(&session, &model, inTensors, &outTensors)
 		if err != vaccel.OK {
 			fmt.Println("TF-Session-Run failed")
 			break
@@ -118,9 +116,9 @@ DeleteInTensor:
 	if inTensor.Release() != vaccel.OK {
 		fmt.Println("An error occurred while releasing the tensor")
 	}
-DeleteTFSession:
-	if tfliteSess.Delete() != vaccel.OK {
-		fmt.Println("An error occurred while deleting the TFLite session")
+UnloadTFLiteModel:
+	if vaccel.TFLiteModelUnload(&session, &model) != vaccel.OK {
+		fmt.Println("An error occurred while unloading the TFLite model")
 	}
 UnregisterResource:
 	if session.Unregister(&model) != vaccel.OK {
