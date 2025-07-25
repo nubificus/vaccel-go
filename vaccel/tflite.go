@@ -225,34 +225,20 @@ func printRecursiveFloat32TFL(data []float32, dims []int32, level int) {
 	}
 }
 
-type TFLiteSession struct {
-	Sess  *Session
-	Model *Resource
-}
-
-func (tfls *TFLiteSession) Init(sess *Session, model *Resource) int {
+func TFLiteModelLoad(sess *Session, model *Resource) int {
 	if sess == nil || model == nil {
 		return EINVAL
 	}
-
-	tfls.Sess = sess
-	tfls.Model = model
-
-	return OK
+	return int(C.vaccel_tflite_model_load(&sess.cSess, &model.cRes)) //nolint:gocritic
 }
 
-func (tfls *TFLiteSession) Load() int {
-	if tfls == nil || tfls.Sess == nil || tfls.Model == nil {
-		return EINVAL
-	}
-	return int(C.vaccel_tflite_session_load(&tfls.Sess.cSess, &tfls.Model.cRes)) //nolint:gocritic
-}
-
-func (tfls *TFLiteSession) Run(
+func TFLiteModelRun(
+	sess *Session,
+	model *Resource,
 	inTensors []TFLiteTensor,
 	outTensors *[]TFLiteTensor,
 ) (int, uint8) {
-	if tfls == nil || tfls.Sess == nil || tfls.Model == nil || outTensors == nil {
+	if sess == nil || model == nil || outTensors == nil {
 		return EINVAL, 0
 	}
 
@@ -276,9 +262,9 @@ func (tfls *TFLiteSession) Run(
 	defer C.free(cOutPtr)
 
 	var cStatus C.uint8_t
-	ret := int(C.vaccel_tflite_session_run(
-		&tfls.Sess.cSess,
-		&tfls.Model.cRes,
+	ret := int(C.vaccel_tflite_model_run(
+		&sess.cSess,
+		&model.cRes,
 		(**C.struct_vaccel_tflite_tensor)(cInPtr),
 		C.int(nrInputs),
 		(**C.struct_vaccel_tflite_tensor)(cOutPtr),
@@ -333,11 +319,7 @@ func (tfls *TFLiteSession) Run(
 	return OK, uint8(cStatus)
 }
 
-func (tfls *TFLiteSession) Delete() int {
-	err := int(C.vaccel_tflite_session_delete(&tfls.Sess.cSess, &tfls.Model.cRes)) //nolint:gocritic
-	if err == OK {
-		tfls.Sess = nil
-		tfls.Model = nil
-	}
+func TFLiteModelUnload(sess *Session, model *Resource) int {
+	err := int(C.vaccel_tflite_model_unload(&sess.cSess, &model.cRes)) //nolint:gocritic
 	return err
 }

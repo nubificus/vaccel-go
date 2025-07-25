@@ -295,30 +295,16 @@ func (s *TFStatus) Release() int {
 	return int(C.vaccel_tf_status_release(&s.cTFStatus)) //nolint:gocritic
 }
 
-type TFSession struct {
-	Sess  *Session
-	Model *Resource
-}
-
-func (tfs *TFSession) Init(sess *Session, model *Resource) int {
+func TFModelLoad(sess *Session, model *Resource, status *TFStatus) int {
 	if sess == nil || model == nil {
 		return EINVAL
 	}
-
-	tfs.Sess = sess
-	tfs.Model = model
-
-	return OK
+	return int(C.vaccel_tf_model_load(&sess.cSess, &model.cRes, &status.cTFStatus)) //nolint:gocritic
 }
 
-func (tfs *TFSession) Load(status *TFStatus) int {
-	if tfs == nil || tfs.Sess == nil || tfs.Model == nil {
-		return EINVAL
-	}
-	return int(C.vaccel_tf_session_load(&tfs.Sess.cSess, &tfs.Model.cRes, &status.cTFStatus)) //nolint:gocritic
-}
-
-func (tfs *TFSession) Run(
+func TFModelRun(
+	sess *Session,
+	model *Resource,
 	runOptions *TFBuffer,
 	inNodes *TFNode,
 	inTensors []TFTensor,
@@ -326,7 +312,7 @@ func (tfs *TFSession) Run(
 	outTensors *[]TFTensor,
 	status *TFStatus,
 ) int {
-	if tfs == nil || tfs.Sess == nil || tfs.Model == nil || inNodes == nil || outNodes == nil || status == nil || outTensors == nil {
+	if sess == nil || model == nil || inNodes == nil || outNodes == nil || status == nil || outTensors == nil {
 		return EINVAL
 	}
 
@@ -349,9 +335,9 @@ func (tfs *TFSession) Run(
 	cOutPtr := C.malloc(outBufSize)
 	defer C.free(cOutPtr)
 
-	ret := int(C.vaccel_tf_session_run(
-		&tfs.Sess.cSess,
-		&tfs.Model.cRes,
+	ret := int(C.vaccel_tf_model_run(
+		&sess.cSess,
+		&model.cRes,
 		func() *C.struct_vaccel_tf_buffer {
 			if runOptions != nil {
 				return &runOptions.cTFBuf
@@ -414,11 +400,7 @@ func (tfs *TFSession) Run(
 	return OK
 }
 
-func (tfs *TFSession) Delete(status *TFStatus) int {
-	err := int(C.vaccel_tf_session_delete(&tfs.Sess.cSess, &tfs.Model.cRes, &status.cTFStatus)) //nolint:gocritic
-	if err == OK {
-		tfs.Sess = nil
-		tfs.Model = nil
-	}
+func TFModelUnload(sess *Session, model *Resource, status *TFStatus) int {
+	err := int(C.vaccel_tf_model_unload(&sess.cSess, &model.cRes, &status.cTFStatus)) //nolint:gocritic
 	return err
 }
