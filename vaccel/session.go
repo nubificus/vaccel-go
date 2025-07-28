@@ -23,11 +23,11 @@ func (s *Session) Release() int {
 }
 
 func (s *Session) Register(r *Resource) int {
-	return int(C.vaccel_resource_register(&r.cRes, &s.cSess)) //nolint:gocritic
+	return int(C.vaccel_resource_register(r.cRes, &s.cSess)) //nolint:gocritic
 }
 
 func (s *Session) Unregister(r *Resource) int {
-	return int(C.vaccel_resource_unregister(&r.cRes, &s.cSess)) //nolint:gocritic
+	return int(C.vaccel_resource_unregister(r.cRes, &s.cSess)) //nolint:gocritic
 }
 
 func (s *Session) GetID() int64 {
