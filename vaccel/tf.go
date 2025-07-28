@@ -299,7 +299,8 @@ func TFModelLoad(sess *Session, model *Resource, status *TFStatus) int {
 	if sess == nil || model == nil {
 		return EINVAL
 	}
-	return int(C.vaccel_tf_model_load(&sess.cSess, &model.cRes, &status.cTFStatus)) //nolint:gocritic
+
+	return int(C.vaccel_tf_model_load(&sess.cSess, model.cRes, &status.cTFStatus)) //nolint:gocritic
 }
 
 func TFModelRun(
@@ -337,7 +338,7 @@ func TFModelRun(
 
 	ret := int(C.vaccel_tf_model_run(
 		&sess.cSess,
-		&model.cRes,
+		model.cRes,
 		func() *C.struct_vaccel_tf_buffer {
 			if runOptions != nil {
 				return &runOptions.cTFBuf
@@ -401,6 +402,6 @@ func TFModelRun(
 }
 
 func TFModelUnload(sess *Session, model *Resource, status *TFStatus) int {
-	err := int(C.vaccel_tf_model_unload(&sess.cSess, &model.cRes, &status.cTFStatus)) //nolint:gocritic
+	err := int(C.vaccel_tf_model_unload(&sess.cSess, model.cRes, &status.cTFStatus)) //nolint:gocritic
 	return err
 }
