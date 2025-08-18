@@ -1,5 +1,5 @@
 .PHONY: all
-all: noop classify exec nonser tf tflite exec_genop
+all: noop classify exec nonser tf tflite exec_genop torch
 
 prepare:
 	@go mod tidy
