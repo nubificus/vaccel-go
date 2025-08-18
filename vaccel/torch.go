@@ -200,7 +200,7 @@ func TorchModelRun(
 	inTensors []TorchTensor,
 	outTensors *[]TorchTensor,
 ) int {
-	if sess == nil || model == nil || buffer == nil || outTensors == nil {
+	if sess == nil || model == nil || outTensors == nil {
 		return EINVAL
 	}
 
@@ -223,10 +223,17 @@ func TorchModelRun(
 	cOutPtr := C.malloc(outBufSize)
 	defer C.free(cOutPtr)
 
+	var bufPtr *C.struct_vaccel_torch_buffer
+	if buffer != nil {
+		bufPtr = &buffer.cTorchBuffer
+	} else {
+		bufPtr = nil
+	}
+
 	ret := int(C.vaccel_torch_model_run(
 		&sess.cSess,
 		&model.cRes,
-		&buffer.cTorchBuffer,
+		bufPtr,
 		(**C.struct_vaccel_torch_tensor)(cInPtr),
 		C.int(nrInputs),
 		(**C.struct_vaccel_torch_tensor)(cOutPtr),
