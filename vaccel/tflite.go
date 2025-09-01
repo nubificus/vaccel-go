@@ -230,7 +230,7 @@ func TFLiteModelLoad(sess *Session, model *Resource) int {
 		return EINVAL
 	}
 
-	return int(C.vaccel_tflite_model_load(&sess.cSess, model.cRes)) //nolint:gocritic
+	return int(C.vaccel_tflite_model_load(sess.cSess, model.cRes)) //nolint:gocritic
 }
 
 func TFLiteModelRun(
@@ -264,7 +264,7 @@ func TFLiteModelRun(
 
 	var cStatus C.uint8_t
 	ret := int(C.vaccel_tflite_model_run(
-		&sess.cSess,
+		sess.cSess,
 		model.cRes,
 		(**C.struct_vaccel_tflite_tensor)(cInPtr),
 		C.int(nrInputs),
@@ -321,6 +321,6 @@ func TFLiteModelRun(
 }
 
 func TFLiteModelUnload(sess *Session, model *Resource) int {
-	err := int(C.vaccel_tflite_model_unload(&sess.cSess, model.cRes)) //nolint:gocritic
+	err := int(C.vaccel_tflite_model_unload(sess.cSess, model.cRes)) //nolint:gocritic
 	return err
 }

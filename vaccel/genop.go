@@ -18,7 +18,7 @@ func Genop(sess *Session, read *ArgList, write *ArgList) int {
 	cNrRead := C.int(read.cList.size)
 	cNrWrite := C.int(write.cList.size)
 
-	cRet := C.vaccel_genop(&sess.cSess, cRead, cNrRead, cWrite, cNrWrite) //nolint:gocritic
+	cRet := C.vaccel_genop(sess.cSess, cRead, cNrRead, cWrite, cNrWrite) //nolint:gocritic
 	return int(cRet)
 
 }
