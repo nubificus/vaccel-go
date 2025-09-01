@@ -190,7 +190,7 @@ func TorchModelLoad(sess *Session, model *Resource) int {
 		return EINVAL
 	}
 
-	return int(C.vaccel_torch_model_load(&sess.cSess, model.cRes)) //nolint:gocritic
+	return int(C.vaccel_torch_model_load(sess.cSess, model.cRes)) //nolint:gocritic
 }
 
 func TorchModelRun(
@@ -231,7 +231,7 @@ func TorchModelRun(
 	}
 
 	ret := int(C.vaccel_torch_model_run(
-		&sess.cSess,
+		sess.cSess,
 		model.cRes,
 		bufPtr,
 		(**C.struct_vaccel_torch_tensor)(cInPtr),
