@@ -150,6 +150,13 @@ func (t *TorchTensor) Data() uintptr {
 	return uintptr(t.cTorchTensor.data)
 }
 
+func (t *TorchTensor) Size() int {
+	if t == nil {
+		return 0
+	}
+	return int(t.cTorchTensor.size)
+}
+
 func (t *TorchTensor) NrDims() int {
 	if t == nil || t.cTorchTensor.dims == nil || t.cTorchTensor.nr_dims <= 0 {
 		return -1

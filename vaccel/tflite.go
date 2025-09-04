@@ -137,6 +137,13 @@ func (t *TFLiteTensor) Data() uintptr {
 	return uintptr(t.cTFLiteTensor.data)
 }
 
+func (t *TFLiteTensor) Size() int {
+	if t == nil {
+		return 0
+	}
+	return int(t.cTFLiteTensor.size)
+}
+
 func (t *TFLiteTensor) NrDims() int {
 	if t == nil || t.cTFLiteTensor.dims == nil || t.cTFLiteTensor.nr_dims <= 0 {
 		return -1
