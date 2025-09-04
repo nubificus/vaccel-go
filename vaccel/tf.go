@@ -185,6 +185,13 @@ func (t *TFTensor) Data() uintptr {
 	return uintptr(t.cTFTensor.data)
 }
 
+func (t *TFTensor) Size() int {
+	if t == nil {
+		return 0
+	}
+	return int(t.cTFTensor.size)
+}
+
 func (t *TFTensor) NrDims() int {
 	if t == nil || t.cTFTensor.dims == nil || t.cTFTensor.nr_dims <= 0 {
 		return -1
@@ -293,6 +300,20 @@ func (s *TFStatus) Release() int {
 		return EINVAL
 	}
 	return int(C.vaccel_tf_status_release(&s.cTFStatus)) //nolint:gocritic
+}
+
+func (s *TFStatus) Code() uint8 {
+	if s == nil {
+		return 0
+	}
+	return uint8(s.cTFStatus.code)
+}
+
+func (s *TFStatus) Message() string {
+	if s == nil || s.cTFStatus.message == nil {
+		return ""
+	}
+	return C.GoString(s.cTFStatus.message)
 }
 
 func TFModelLoad(sess *Session, model *Resource, status *TFStatus) int {
