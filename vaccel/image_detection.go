@@ -27,14 +27,14 @@ func ImageDetectionFromFile(sess *Session, imagePath string) (string, int) {
 	cImgBuf := unsafe.Pointer(cImageBytes)
 	cImgLen := C.size_t(len(imageBytes))
 
-	cOutImageName := (*C.uchar)(C.malloc(C.size_t(256)))
+	cOutImageName := (*C.uchar)(C.malloc(C.size_t(1024)))
 
 	/* Free the memory when done */
 	defer C.free(unsafe.Pointer(cOutImageName))
 
 	cRet := C.vaccel_image_detection(
 		sess.cSess, cImgBuf, cOutImageName,
-		cImgLen, C.size_t(256)) //nolint:gocritic
+		cImgLen, C.size_t(1024)) //nolint:gocritic
 
 	var golangOut string
 
@@ -56,14 +56,14 @@ func ImageDetection(sess *Session, image []byte) (string, int) {
 	cImgBuf := unsafe.Pointer(cImageBytes)
 	cImgLen := C.size_t(len(image))
 
-	cOutImageName := (*C.uchar)(C.malloc(C.size_t(256)))
+	cOutImageName := (*C.uchar)(C.malloc(C.size_t(1024)))
 
 	/* Free the memory when done */
 	defer C.free(unsafe.Pointer(cOutImageName))
 
 	cRet := C.vaccel_image_detection(
 		sess.cSess, cImgBuf, cOutImageName,
-		cImgLen, C.size_t(256)) //nolint:gocritic
+		cImgLen, C.size_t(1024)) //nolint:gocritic
 
 	var golangOut string
 
