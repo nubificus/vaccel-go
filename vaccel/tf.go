@@ -15,6 +15,7 @@ package vaccel
 import "C"
 import (
 	"fmt"
+	"strings"
 	"unsafe"
 )
 
@@ -281,7 +282,7 @@ func printRecursiveFloat32(data []float32, dims []int64, level int) {
 }
 
 func indent(level int) string {
-	return "  " + string(make([]rune, level*2))
+	return strings.Repeat("  ", level)
 }
 
 type TFStatus struct {

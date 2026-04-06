@@ -22,12 +22,12 @@ func main() {
 
 	path := os.Args[1]
 	input := os.Args[2]
-	inputInt64, e := strconv.Atoi(input)
+	parsedInput, e := strconv.ParseInt(input, 10, 32)
 	if e != nil {
 		fmt.Println("error converting input")
 		return
 	}
-	inputInt32 := int32(inputInt64)
+	inputInt32 := int32(parsedInput)
 
 	var session vaccel.Session
 	err := session.Init(0)

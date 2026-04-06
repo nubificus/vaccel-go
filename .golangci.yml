@@ -17,7 +17,12 @@ linters:
     paths:
       - third_party$
       - builtin$
-      - examples$
+    rules:
+      # Skip path traversal check for examples - arbitrary files may be opened
+      - path-except: 'examples/*/*.go'
+        linters:
+          - gosec
+        text: "G703"
 issues:
   uniq-by-line: false
 formatters:
@@ -29,4 +34,3 @@ formatters:
     paths:
       - third_party$
       - builtin$
-      - examples$
