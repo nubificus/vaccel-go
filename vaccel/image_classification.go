@@ -31,7 +31,7 @@ func ImageClassificationFromFile(sess *Session, imagePath string) (string, int) 
 
 	cRet := C.vaccel_image_classification(
 		sess.cSess, cImgBuf, cText, cOutImageName,
-		cImgLen, C.size_t(256), C.size_t(256)) //nolint:gocritic
+		cImgLen, C.size_t(256), C.size_t(256))
 
 	var golangOut string
 
@@ -62,7 +62,7 @@ func ImageClassification(sess *Session, image []byte) (string, int) {
 
 	cRet := C.vaccel_image_classification(
 		sess.cSess, cImgBuf, cText, cOutImageName,
-		cImgLen, C.size_t(256), C.size_t(256)) //nolint:gocritic
+		cImgLen, C.size_t(256), C.size_t(256))
 
 	var golangOut string
 

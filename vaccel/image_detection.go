@@ -29,7 +29,7 @@ func ImageDetectionFromFile(sess *Session, imagePath string) (string, int) {
 
 	cRet := C.vaccel_image_detection(
 		sess.cSess, cImgBuf, cOutImageName,
-		cImgLen, C.size_t(1024)) //nolint:gocritic
+		cImgLen, C.size_t(1024))
 
 	var golangOut string
 
@@ -58,7 +58,7 @@ func ImageDetection(sess *Session, image []byte) (string, int) {
 
 	cRet := C.vaccel_image_detection(
 		sess.cSess, cImgBuf, cOutImageName,
-		cImgLen, C.size_t(1024)) //nolint:gocritic
+		cImgLen, C.size_t(1024))
 
 	var golangOut string
 

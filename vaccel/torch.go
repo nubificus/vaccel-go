@@ -26,11 +26,11 @@ type TorchBuffer struct {
 }
 
 func (b *TorchBuffer) Init(data string) int {
-	return int(C.vaccel_torch_buffer_init(&b.cTorchBuffer, C.CString(data), C.size_t(len(data)))) //nolint:gocritic
+	return int(C.vaccel_torch_buffer_init(&b.cTorchBuffer, C.CString(data), C.size_t(len(data))))
 }
 
 func (b *TorchBuffer) Release() int {
-	return int(C.vaccel_torch_buffer_release(&b.cTorchBuffer)) //nolint:gocritic
+	return int(C.vaccel_torch_buffer_release(&b.cTorchBuffer))
 }
 
 func (b *TorchBuffer) TakeData() string {
@@ -71,14 +71,14 @@ func (t *TorchTensor) Init(dims []int64, dtype TorchDataType) int {
 		&t.cTorchTensor,
 		C.int64_t(len(dims)),
 		cDims,
-		C.enum_vaccel_torch_data_type(dtype), //nolint:gocritic
+		C.enum_vaccel_torch_data_type(dtype),
 	)
 
 	return int(ret)
 }
 
 func (t *TorchTensor) Release() int {
-	return int(C.vaccel_torch_tensor_delete(t.cTorchTensor)) //nolint:gocritic
+	return int(C.vaccel_torch_tensor_delete(t.cTorchTensor))
 }
 
 func (t *TorchTensor) Allocate(dims []int64, dtype TorchDataType, totalSize uint) int {
@@ -93,7 +93,7 @@ func (t *TorchTensor) Allocate(dims []int64, dtype TorchDataType, totalSize uint
 
 	t.cTorchTensor.data = C.malloc(C.size_t(totalSize))
 	if t.cTorchTensor.data == nil {
-		C.vaccel_torch_tensor_delete(t.cTorchTensor) //nolint:gocritic
+		C.vaccel_torch_tensor_delete(t.cTorchTensor)
 		return ENOMEM
 	}
 
@@ -188,7 +188,7 @@ func TorchModelLoad(sess *Session, model *Resource) int {
 		return EINVAL
 	}
 
-	return int(C.vaccel_torch_model_load(sess.cSess, model.cRes)) //nolint:gocritic
+	return int(C.vaccel_torch_model_load(sess.cSess, model.cRes))
 }
 
 func TorchModelRun(
@@ -235,7 +235,7 @@ func TorchModelRun(
 		(**C.struct_vaccel_torch_tensor)(cInPtr),
 		C.int(nrInputs),
 		(**C.struct_vaccel_torch_tensor)(cOutPtr),
-		C.int(nrOutputs), //nolint:gocritic
+		C.int(nrOutputs),
 	))
 	if ret != OK {
 		return ret
@@ -259,7 +259,7 @@ func TorchModelRun(
 
 			var data unsafe.Pointer
 			var size C.size_t
-			ret = int(C.vaccel_torch_tensor_take_data(outTensorSlice[i], &data, &size)) //nolint:gocritic
+			ret = int(C.vaccel_torch_tensor_take_data(outTensorSlice[i], &data, &size))
 			if ret != OK {
 				fmt.Println("Could not take data from output C tensor")
 				return ret

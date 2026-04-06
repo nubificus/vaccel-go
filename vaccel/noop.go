@@ -6,5 +6,5 @@ package vaccel
 import "C"
 
 func NoOp(sess *Session) int {
-	return int(C.vaccel_noop(sess.cSess)) //nolint:gocritic
+	return int(C.vaccel_noop(sess.cSess))
 }

@@ -19,7 +19,7 @@ type Blob struct {
 }
 
 func (b *Blob) Init(path string) int {
-	return int(C.vaccel_blob_new(&b.cBlob, C.CString(path))) //nolint:gocritic
+	return int(C.vaccel_blob_new(&b.cBlob, C.CString(path)))
 }
 
 func (b *Blob) InitFromBuf(bytes []byte, own bool, filename string, dir string, randomize bool) int {
@@ -35,9 +35,9 @@ func (b *Blob) InitFromBuf(bytes []byte, own bool, filename string, dir string, 
 		defer C.free(unsafe.Pointer(cdname))
 	}
 
-	return int(C.vaccel_blob_from_buf(&b.cBlob, cBlobBytes, cBlobLen, C.bool(own), C.CString(filename), cdname, C.bool(randomize))) //nolint:gocritic
+	return int(C.vaccel_blob_from_buf(&b.cBlob, cBlobBytes, cBlobLen, C.bool(own), C.CString(filename), cdname, C.bool(randomize)))
 }
 
 func (b *Blob) Release() int {
-	return int(C.vaccel_blob_delete(b.cBlob)) //nolint:gocritic
+	return int(C.vaccel_blob_delete(b.cBlob))
 }
