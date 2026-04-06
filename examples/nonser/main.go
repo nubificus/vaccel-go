@@ -6,7 +6,6 @@ import (
 	"C"
 	"fmt"
 	"os"
-	"reflect"
 	"unsafe"
 
 	"github.com/nubificus/vaccel-go/vaccel"
@@ -53,11 +52,7 @@ func Deserialize(buf unsafe.Pointer) unsafe.Pointer {
 	sizeExtr := *((*uint32)(buf))
 
 	/* Convert unsafe.Pointer to Slice */
-	var slice []uint32
-	header := (*reflect.SliceHeader)(unsafe.Pointer(&slice))
-	header.Data = uintptr(buf)
-	header.Len = int(sizeExtr + 1)
-	header.Cap = int(sizeExtr + 1)
+	slice := unsafe.Slice((*uint32)(buf), sizeExtr+1)
 
 	/* Reconstruct the structure */
 	mydatabuf := new(MyData)

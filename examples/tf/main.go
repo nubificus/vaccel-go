@@ -100,7 +100,7 @@ func main() {
 
 	err = outNode.Init("StatefulPartitionedCall", 0)
 	if err != vaccel.OK {
-		fmt.Println("Cound not configure output TF Node")
+		fmt.Println("Could not configure output TF Node")
 		goto DeleteInTensor
 	}
 
