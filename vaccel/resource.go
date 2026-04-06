@@ -23,7 +23,7 @@ func (t ResourceType) ToCEnum() C.vaccel_resource_type_t {
 }
 
 func (r *Resource) Init(path string, resType ResourceType) int {
-	return int(C.vaccel_resource_new(&r.cRes, C.CString(path), resType.ToCEnum())) //nolint:gocritic
+	return int(C.vaccel_resource_new(&r.cRes, C.CString(path), resType.ToCEnum()))
 }
 
 func (r *Resource) InitMulti(paths []string, resType ResourceType) int {
@@ -43,7 +43,7 @@ func (r *Resource) InitMulti(paths []string, resType ResourceType) int {
 
 		pathSlice[i] = str
 	}
-	return int(C.vaccel_resource_multi_new(&r.cRes, cPathsPtr, cNrPaths, resType.ToCEnum())) //nolint:gocritic
+	return int(C.vaccel_resource_multi_new(&r.cRes, cPathsPtr, cNrPaths, resType.ToCEnum()))
 }
 
 func (r *Resource) InitFromBuf(bytes []byte, resType ResourceType, filename string, memOnly bool) int {
@@ -59,7 +59,7 @@ func (r *Resource) InitFromBuf(bytes []byte, resType ResourceType, filename stri
 		defer C.free(unsafe.Pointer(cfname))
 	}
 
-	return int(C.vaccel_resource_from_buf(&r.cRes, cResBuf, cResLen, resType.ToCEnum(), cfname, C.bool(memOnly))) //nolint:gocritic
+	return int(C.vaccel_resource_from_buf(&r.cRes, cResBuf, cResLen, resType.ToCEnum(), cfname, C.bool(memOnly)))
 }
 
 func (r *Resource) InitFromBlobs(blobs []Blob, resType ResourceType) int {
@@ -77,11 +77,11 @@ func (r *Resource) InitFromBlobs(blobs []Blob, resType ResourceType) int {
 		blobSlice[i] = blobs[i].cBlob
 	}
 
-	return int(C.vaccel_resource_from_blobs(&r.cRes, cBlobsPtr, cNrBlobs, resType.ToCEnum())) //nolint:gocritic
+	return int(C.vaccel_resource_from_blobs(&r.cRes, cBlobsPtr, cNrBlobs, resType.ToCEnum()))
 }
 
 func (r *Resource) Release() int {
-	return int(C.vaccel_resource_delete(r.cRes)) //nolint:gocritic
+	return int(C.vaccel_resource_delete(r.cRes))
 }
 
 func (r *Resource) GetID() int64 {

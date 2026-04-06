@@ -46,11 +46,11 @@ type TFBuffer struct {
 func (b *TFBuffer) Init(data uintptr, size uint) int {
 	cData := unsafe.Pointer(data)
 	cSize := C.size_t(size)
-	return int(C.vaccel_tf_buffer_init(&b.cTFBuf, cData, cSize)) //nolint:gocritic
+	return int(C.vaccel_tf_buffer_init(&b.cTFBuf, cData, cSize))
 }
 
 func (b *TFBuffer) Release() int {
-	return int(C.vaccel_tf_buffer_release(&b.cTFBuf)) //nolint:gocritic
+	return int(C.vaccel_tf_buffer_release(&b.cTFBuf))
 }
 
 func (b *TFBuffer) TakeData() (uintptr, uint) {
@@ -75,11 +75,11 @@ func (n *TFNode) Init(name string, id int) int {
 	cInt := C.int(id)
 	cStr := C.CString(name)
 	defer C.free(unsafe.Pointer(cStr))
-	return int(C.vaccel_tf_node_init(&n.cTFNode, cStr, cInt)) //nolint:gocritic
+	return int(C.vaccel_tf_node_init(&n.cTFNode, cStr, cInt))
 }
 
 func (n *TFNode) Release() int {
-	return int(C.vaccel_tf_node_release(&n.cTFNode)) //nolint:gocritic
+	return int(C.vaccel_tf_node_release(&n.cTFNode))
 }
 
 type TFTensor struct {
@@ -107,14 +107,14 @@ func (t *TFTensor) Init(dims []int64, dtype TFDataType) int {
 		&t.cTFTensor,
 		C.int(len(dims)),
 		cDims,
-		C.enum_vaccel_tf_data_type(dtype), //nolint:gocritic
+		C.enum_vaccel_tf_data_type(dtype),
 	)
 
 	return int(ret)
 }
 
 func (t *TFTensor) Release() int {
-	return int(C.vaccel_tf_tensor_release(&t.cTFTensor)) //nolint:gocritic
+	return int(C.vaccel_tf_tensor_release(&t.cTFTensor))
 }
 
 func (t *TFTensor) Allocate(dims []int64, dtype TFDataType, totalSize uint) int {
@@ -129,7 +129,7 @@ func (t *TFTensor) Allocate(dims []int64, dtype TFDataType, totalSize uint) int 
 
 	t.cTFTensor.data = C.malloc(C.size_t(totalSize))
 	if t.cTFTensor.data == nil {
-		C.vaccel_tf_tensor_release(&t.cTFTensor) //nolint:gocritic
+		C.vaccel_tf_tensor_release(&t.cTFTensor)
 		return ENOMEM
 	}
 
@@ -284,14 +284,14 @@ func (s *TFStatus) Init(errorCode uint8, message string) int {
 	cErr := C.uint8_t(errorCode)
 	cMsg := C.CString(message)
 	defer C.free(unsafe.Pointer(cMsg))
-	return int(C.vaccel_tf_status_init(&s.cTFStatus, cErr, cMsg)) //nolint:gocritic
+	return int(C.vaccel_tf_status_init(&s.cTFStatus, cErr, cMsg))
 }
 
 func (s *TFStatus) Release() int {
 	if s == nil {
 		return EINVAL
 	}
-	return int(C.vaccel_tf_status_release(&s.cTFStatus)) //nolint:gocritic
+	return int(C.vaccel_tf_status_release(&s.cTFStatus))
 }
 
 func (s *TFStatus) Code() uint8 {
@@ -313,7 +313,7 @@ func TFModelLoad(sess *Session, model *Resource, status *TFStatus) int {
 		return EINVAL
 	}
 
-	return int(C.vaccel_tf_model_load(sess.cSess, model.cRes, &status.cTFStatus)) //nolint:gocritic
+	return int(C.vaccel_tf_model_load(sess.cSess, model.cRes, &status.cTFStatus))
 }
 
 func TFModelRun(
@@ -364,7 +364,7 @@ func TFModelRun(
 		&outNodes.cTFNode,
 		(**C.struct_vaccel_tf_tensor)(cOutPtr),
 		C.int(nrOutputs),
-		&status.cTFStatus, //nolint:gocritic
+		&status.cTFStatus,
 	))
 	if ret != OK {
 		return ret
@@ -388,7 +388,7 @@ func TFModelRun(
 
 			var data unsafe.Pointer
 			var size C.size_t
-			ret = int(C.vaccel_tf_tensor_take_data(outTensorSlice[i], &data, &size)) //nolint:gocritic
+			ret = int(C.vaccel_tf_tensor_take_data(outTensorSlice[i], &data, &size))
 			if ret != OK {
 				fmt.Println("Could not take data from output C tensor")
 				return ret
@@ -415,6 +415,6 @@ func TFModelRun(
 }
 
 func TFModelUnload(sess *Session, model *Resource, status *TFStatus) int {
-	err := int(C.vaccel_tf_model_unload(sess.cSess, model.cRes, &status.cTFStatus)) //nolint:gocritic
+	err := int(C.vaccel_tf_model_unload(sess.cSess, model.cRes, &status.cTFStatus))
 	return err
 }
