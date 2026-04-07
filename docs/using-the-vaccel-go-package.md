@@ -116,8 +116,8 @@ Those functions must follow a specific signature, which is presented below:
 ```go
 /* Let's say you want to handle the following structure */
 type MyData struct {
-	Size uint32
-	Arr []uint32
+    Size uint32
+    Arr []uint32
 }
 
 /*
@@ -128,44 +128,44 @@ type MyData struct {
 */
 func Serialize(buf unsafe.Pointer) (unsafe.Pointer, uint32) {
 
-	mydata := (*MyData)(buf)
-	serialBuf := make([]uint32, mydata.Size + 1)
-	serialBuf[0] = uint32(mydata.Size)
+    mydata := (*MyData)(buf)
+    serialBuf := make([]uint32, mydata.Size + 1)
+    serialBuf[0] = uint32(mydata.Size)
 
-	var i uint32
-	for i=0; i<mydata.Size; i++ {
-		serialBuf[i + 1] = mydata.Arr[i]
-	}
+    var i uint32
+    for i=0; i<mydata.Size; i++ {
+        serialBuf[i + 1] = mydata.Arr[i]
+    }
 
-	retBuf := unsafe.Pointer(&serialBuf[0])
-	bytes  := (mydata.Size + 1) * 4
+    retBuf := unsafe.Pointer(&serialBuf[0])
+    bytes  := (mydata.Size + 1) * 4
 
-	return retBuf, bytes
+    return retBuf, bytes
 }
 
 /* Function that constructs an instance of MyData out of serialized data */
 func Deserialize(buf unsafe.Pointer) unsafe.Pointer {
 
-	sizeExtr := *((*uint32)(buf))
+    sizeExtr := *((*uint32)(buf))
 
-	/* Convert unsafe.Pointer to Slice */
-	var slice []uint32
-	header := (*reflect.SliceHeader)(unsafe.Pointer(&slice))
-	header.Data = uintptr(buf)
-	header.Len  = int(sizeExtr + 1)
-	header.Cap  = int(sizeExtr + 1)
+    /* Convert unsafe.Pointer to Slice */
+    var slice []uint32
+    header := (*reflect.SliceHeader)(unsafe.Pointer(&slice))
+    header.Data = uintptr(buf)
+    header.Len  = int(sizeExtr + 1)
+    header.Cap  = int(sizeExtr + 1)
 
-	/* Reconstruct the structure */
-	mydatabuf := new(MyData)
-	mydatabuf.Size = sizeExtr
-	mydatabuf.Arr = make([]uint32, sizeExtr)
+    /* Reconstruct the structure */
+    mydatabuf := new(MyData)
+    mydatabuf.Size = sizeExtr
+    mydatabuf.Arr = make([]uint32, sizeExtr)
 
-	var i uint32
-	for i=0; i<sizeExtr; i++ {
-		mydatabuf.Arr[i] = slice[i + 1]
-	}
+    var i uint32
+    for i=0; i<sizeExtr; i++ {
+        mydatabuf.Arr[i] = slice[i + 1]
+    }
 
-	return unsafe.Pointer(mydatabuf)
+    return unsafe.Pointer(mydatabuf)
 }
 ```
 
@@ -178,7 +178,7 @@ var myDataInput MyData = ...
 err = read.AddNonSerialArg(&myDataInput, 0, Serialize)
 
 if err != 0 {
-	[...]
+    [...]
 }
 ```
 
@@ -188,7 +188,7 @@ if err != 0 {
 outbuf := write.ExtractNonSerialArg(0, Deserialize)
 
 if outbuf == nil {
-	[...]
+    [...]
 }
 
 mydata_out := (*MyData)(outbuf)
