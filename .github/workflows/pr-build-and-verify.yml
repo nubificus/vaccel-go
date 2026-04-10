@@ -1,0 +1,89 @@
+name: Build and Verify
+
+on:
+  pull_request:
+    branches: ["main"]
+    types: [synchronize, labeled]
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  check-pr-status:
+    name: Check PR status
+    uses: nubificus/vaccel/.github/workflows/check-pr-status.yml@main
+    secrets: inherit
+
+  test-build:
+    needs: check-pr-status
+    name: Test Build
+    if: needs.check-pr-status.outputs.expects-checks == 'true'
+    uses: nubificus/vaccel/.github/workflows/test-build.yml@main
+    with:
+      options: ''
+      valgrind: false
+    secrets: inherit
+
+#  verify-build:
+#    needs: check-pr-status
+#    name: Verify Build
+#    if: needs.check-pr-status.outputs.expects-checks == 'true'
+#    uses: nubificus/vaccel/.github/workflows/verify-build.yml@main
+#    with:
+#      options: ''
+#      valgrind: false
+#      skip-examples: true
+#    secrets: inherit
+
+  validate-files-and-commits:
+    needs: check-pr-status
+    name: Validate Files and Commits
+    if: needs.check-pr-status.outputs.expects-checks == 'true'
+    uses: nubificus/vaccel/.github/workflows/validate-files-and-commits.yml@main
+    secrets: inherit
+
+  validate-code:
+    needs: check-pr-status
+    name: Validate Code
+    if: needs.check-pr-status.outputs.expects-checks == 'true'
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+    uses: ./.github/workflows/validate-code.yml
+    secrets: inherit
+
+#  generate-coverage:
+#    needs: 
+#      - check-pr-status
+#      - test-build
+#      - verify-build
+#      - validate-files-and-commits
+#      - validate-code
+#    name: Generate Coverage Report
+#    uses: ./.github/workflows/coverage-report.yml
+#    with:
+#      comment-diff: true
+
+  # Dummy job for setting required checks
+  jobs-completed:
+    needs:
+      - check-pr-status
+      - test-build
+      - validate-files-and-commits
+      - validate-code
+    name: Jobs Completed
+    if: >-
+      always() &&
+      (needs.check-pr-status.outputs.is-approved == 'true' ||
+        (needs.check-pr-status.outputs.expects-checks == 'true' &&
+          !contains(needs.*.result, 'failure') &&
+          !contains(needs.*.result, 'cancelled')))
+    runs-on: base-2204-amd64
+    steps:
+      - run: exit 0
