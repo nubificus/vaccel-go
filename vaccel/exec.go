@@ -2,13 +2,7 @@
 
 package vaccel
 
-/*
-
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-
-*/
+// #include <vaccel/ops/exec.h>
 import "C"
 
 func ExecWithResource(sess *Session, res *Resource, funcname string,

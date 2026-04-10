@@ -2,13 +2,7 @@
 
 package vaccel
 
-/*
-
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-
-*/
+// #include <vaccel/ops/genop.h>
 import "C"
 
 func Genop(sess *Session, read *ArgList, write *ArgList) int {
