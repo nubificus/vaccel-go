@@ -1,0 +1,64 @@
+name: 'Build Meson Project'
+description: 'Configure, build and install meson projects'
+
+inputs:
+  coverage:
+    description: 'Whether to enable coverage tracking for the build'
+    default: 'false'
+  options:
+    description: 'Comma-separated list of build options'
+    default: ''
+  prefix:
+    description: 'Installation prefix'
+    default: ${{ github.workspace }}/opt
+  pkgconfig-prefix:
+    description: 'Prefix of the PKG_CONFIG_PATH'
+    default: ''
+  build-path:
+    description: >
+      Path to the project's build directory
+    default: 'build'
+  source-path:
+    description: >
+      Path to the project's source directory
+    default: '.'
+  build-type:
+    description: 'Type of the build'
+    default: 'plain'
+  build:
+    description: 'Whether to build the project'
+    default: ''
+  install:
+    description: >
+      Whether to install the project. If "true", the project will first be
+      built.
+    default: 'false'
+  dist:
+    description: 'Whether to generate distribution artifacts for the project'
+    default: 'false'
+  subprojects:
+    description: >
+      Whether to include subprojects (when "install" or "dist" are "true")
+    default: 'true'
+  dist-tests:
+    description: 'Whether to run project tests (when "dist" is "true")'
+    default: 'false'
+  install-deb:
+    description: 'Whether to install generated .deb artifacts'
+    default: 'false'
+
+outputs:
+  dist-path:
+    value: ${{ steps.dist.outputs.dist-path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build project
+      working-directory: ${{ inputs.source-path }}
+      if: >-
+        (inputs.build == '' && inputs.dist == 'false') ||
+        inputs.build == 'true' ||
+        inputs.install == 'true'
+      run: make
+      shell: bash
