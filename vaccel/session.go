@@ -2,12 +2,7 @@
 
 package vaccel
 
-/*
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-
-*/
+// #include <vaccel/session.h>
 import "C"
 
 type Session struct {

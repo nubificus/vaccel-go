@@ -2,16 +2,7 @@
 
 package vaccel
 
-/*
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <vaccel.h>
-
-*/
+// #include <vaccel/ops/tf.h>
 import "C"
 import (
 	"fmt"

@@ -2,12 +2,7 @@
 
 package vaccel
 
-/*
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-
-*/
+// #include <vaccel/ops/noop.h>
 import "C"
 
 func NoOp(sess *Session) int {
