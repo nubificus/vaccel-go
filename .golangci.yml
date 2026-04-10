@@ -1,6 +1,7 @@
 version: "2"
 run:
   issues-exit-code: 1
+
 linters:
   enable:
     - gocritic
@@ -23,8 +24,15 @@ linters:
         linters:
           - gosec
         text: "G703"
+      # TODO: Update deprecated functions and remove this
+      - path-except: 'args.go'
+        linters:
+          - staticcheck
+        text: "SA1019"
+
 issues:
   uniq-by-line: false
+
 formatters:
   enable:
     - gofmt

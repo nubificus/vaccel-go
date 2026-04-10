@@ -2,18 +2,7 @@
 
 package vaccel
 
-/*
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-#include <stdatomic.h>
-#include <stdint.h>
-
-static uint32_t get_refcount(atomic_uint *ref) {
-	return atomic_load((_Atomic unsigned int *)ref);
-}
-
-*/
+// #include <vaccel/resource.h>
 import "C"
 import "unsafe"
 
@@ -100,5 +89,5 @@ func (r *Resource) GetID() int64 {
 }
 
 func (r *Resource) GetRefcount() uint32 {
-	return uint32(C.get_refcount(&r.cRes.refcount))
+	return uint32(C.vaccel_resource_refcount(r.cRes))
 }
