@@ -11,13 +11,12 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 	"unsafe"
 
-	"github.com/nfnt/resize"
 	"github.com/nubificus/vaccel-go/vaccel"
+	"golang.org/x/image/draw"
 )
 
 const (
@@ -48,10 +47,8 @@ func loadLabels(path string) ([]string, error) {
 }
 
 func preprocessImage(img image.Image) ([]float32, error) {
-	resized := resize.Resize(ImageWidth, ImageHeight, img, resize.NearestNeighbor)
-	if resized.Bounds().Dx() != ImageWidth || resized.Bounds().Dy() != ImageHeight {
-		return nil, errors.New("resized image has wrong dimensions")
-	}
+	resized := image.NewRGBA(image.Rect(0, 0, ImageWidth, ImageHeight))
+	draw.NearestNeighbor.Scale(resized, resized.Bounds(), img, img.Bounds(), draw.Src, nil)
 
 	mean := [3]float32{0.485, 0.456, 0.406}
 	std := [3]float32{0.229, 0.224, 0.225}
@@ -212,11 +209,7 @@ func main() {
 			break
 		}
 
-		output := make([]float32, 1000)
-		sliceHeader := (*reflect.SliceHeader)(unsafe.Pointer(&output))
-		sliceHeader.Data = outData
-		sliceHeader.Len = 1000
-		sliceHeader.Cap = 1000
+		output := unsafe.Slice((*float32)(unsafe.Pointer(outData)), 1000)
 
 		fmt.Println("Success!")
 

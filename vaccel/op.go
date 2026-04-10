@@ -2,9 +2,7 @@
 
 package vaccel
 
-/*
-#include <vaccel.h>
-*/
+// #include <vaccel/op.h>
 import "C"
 
 type OpType int32

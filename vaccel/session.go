@@ -2,12 +2,7 @@
 
 package vaccel
 
-/*
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-
-*/
+// #include <vaccel/session.h>
 import "C"
 
 type Session struct {
@@ -15,19 +10,19 @@ type Session struct {
 }
 
 func (s *Session) Init(flags uint32) int {
-	return int(C.vaccel_session_new(&s.cSess, C.uint32_t(flags))) //nolint:gocritic
+	return int(C.vaccel_session_new(&s.cSess, C.uint32_t(flags)))
 }
 
 func (s *Session) Release() int {
-	return int(C.vaccel_session_delete(s.cSess)) //nolint:gocritic
+	return int(C.vaccel_session_delete(s.cSess))
 }
 
 func (s *Session) Register(r *Resource) int {
-	return int(C.vaccel_resource_register(r.cRes, s.cSess)) //nolint:gocritic
+	return int(C.vaccel_resource_register(r.cRes, s.cSess))
 }
 
 func (s *Session) Unregister(r *Resource) int {
-	return int(C.vaccel_resource_unregister(r.cRes, s.cSess)) //nolint:gocritic
+	return int(C.vaccel_resource_unregister(r.cRes, s.cSess))
 }
 
 func (s *Session) GetID() int64 {
@@ -35,7 +30,7 @@ func (s *Session) GetID() int64 {
 }
 
 func (s *Session) Update(flags uint32) int {
-	return int(C.vaccel_session_update(s.cSess, C.uint32_t(flags))) //nolint:gocritic
+	return int(C.vaccel_session_update(s.cSess, C.uint32_t(flags)))
 }
 
 func (s *Session) GetFlags() int32 {

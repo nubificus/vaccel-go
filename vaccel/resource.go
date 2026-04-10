@@ -2,18 +2,7 @@
 
 package vaccel
 
-/*
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-#include <stdatomic.h>
-#include <stdint.h>
-
-static uint32_t get_refcount(atomic_uint *ref) {
-	return atomic_load((_Atomic unsigned int *)ref);
-}
-
-*/
+// #include <vaccel/resource.h>
 import "C"
 import "unsafe"
 
@@ -34,7 +23,7 @@ func (t ResourceType) ToCEnum() C.vaccel_resource_type_t {
 }
 
 func (r *Resource) Init(path string, resType ResourceType) int {
-	return int(C.vaccel_resource_new(&r.cRes, C.CString(path), resType.ToCEnum())) //nolint:gocritic
+	return int(C.vaccel_resource_new(&r.cRes, C.CString(path), resType.ToCEnum()))
 }
 
 func (r *Resource) InitMulti(paths []string, resType ResourceType) int {
@@ -54,7 +43,7 @@ func (r *Resource) InitMulti(paths []string, resType ResourceType) int {
 
 		pathSlice[i] = str
 	}
-	return int(C.vaccel_resource_multi_new(&r.cRes, cPathsPtr, cNrPaths, resType.ToCEnum())) //nolint:gocritic
+	return int(C.vaccel_resource_multi_new(&r.cRes, cPathsPtr, cNrPaths, resType.ToCEnum()))
 }
 
 func (r *Resource) InitFromBuf(bytes []byte, resType ResourceType, filename string, memOnly bool) int {
@@ -70,7 +59,7 @@ func (r *Resource) InitFromBuf(bytes []byte, resType ResourceType, filename stri
 		defer C.free(unsafe.Pointer(cfname))
 	}
 
-	return int(C.vaccel_resource_from_buf(&r.cRes, cResBuf, cResLen, resType.ToCEnum(), cfname, C.bool(memOnly))) //nolint:gocritic
+	return int(C.vaccel_resource_from_buf(&r.cRes, cResBuf, cResLen, resType.ToCEnum(), cfname, C.bool(memOnly)))
 }
 
 func (r *Resource) InitFromBlobs(blobs []Blob, resType ResourceType) int {
@@ -88,11 +77,11 @@ func (r *Resource) InitFromBlobs(blobs []Blob, resType ResourceType) int {
 		blobSlice[i] = blobs[i].cBlob
 	}
 
-	return int(C.vaccel_resource_from_blobs(&r.cRes, cBlobsPtr, cNrBlobs, resType.ToCEnum())) //nolint:gocritic
+	return int(C.vaccel_resource_from_blobs(&r.cRes, cBlobsPtr, cNrBlobs, resType.ToCEnum()))
 }
 
 func (r *Resource) Release() int {
-	return int(C.vaccel_resource_delete(r.cRes)) //nolint:gocritic
+	return int(C.vaccel_resource_delete(r.cRes))
 }
 
 func (r *Resource) GetID() int64 {
@@ -100,5 +89,5 @@ func (r *Resource) GetID() int64 {
 }
 
 func (r *Resource) GetRefcount() uint32 {
-	return uint32(C.get_refcount(&r.cRes.refcount))
+	return uint32(C.vaccel_resource_refcount(r.cRes))
 }

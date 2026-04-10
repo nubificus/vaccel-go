@@ -2,16 +2,7 @@
 
 package vaccel
 
-/*
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <vaccel.h>
-
-*/
+// #include <vaccel/ops/tflite.h>
 import "C"
 import (
 	"fmt"
@@ -67,14 +58,14 @@ func (t *TFLiteTensor) Init(dims []int32, dtype TFLiteDataType) int {
 		&t.cTFLiteTensor,
 		C.int(len(dims)),
 		cDims,
-		C.enum_vaccel_tflite_data_type(dtype), //nolint:gocritic
+		C.enum_vaccel_tflite_data_type(dtype),
 	)
 
 	return int(ret)
 }
 
 func (t *TFLiteTensor) Release() int {
-	return int(C.vaccel_tflite_tensor_release(&t.cTFLiteTensor)) //nolint:gocritic
+	return int(C.vaccel_tflite_tensor_release(&t.cTFLiteTensor))
 }
 
 func (t *TFLiteTensor) Allocate(dims []int32, dtype TFLiteDataType, totalSize uint) int {
@@ -89,7 +80,7 @@ func (t *TFLiteTensor) Allocate(dims []int32, dtype TFLiteDataType, totalSize ui
 
 	t.cTFLiteTensor.data = C.malloc(C.size_t(totalSize))
 	if t.cTFLiteTensor.data == nil {
-		C.vaccel_tflite_tensor_release(&t.cTFLiteTensor) //nolint:gocritic
+		C.vaccel_tflite_tensor_release(&t.cTFLiteTensor)
 		return ENOMEM
 	}
 
@@ -237,7 +228,7 @@ func TFLiteModelLoad(sess *Session, model *Resource) int {
 		return EINVAL
 	}
 
-	return int(C.vaccel_tflite_model_load(sess.cSess, model.cRes)) //nolint:gocritic
+	return int(C.vaccel_tflite_model_load(sess.cSess, model.cRes))
 }
 
 func TFLiteModelRun(
@@ -277,7 +268,7 @@ func TFLiteModelRun(
 		C.int(nrInputs),
 		(**C.struct_vaccel_tflite_tensor)(cOutPtr),
 		C.int(nrOutputs),
-		&cStatus, //nolint:gocritic
+		&cStatus,
 	))
 	if ret != OK {
 		return ret, uint8(cStatus)
@@ -301,7 +292,7 @@ func TFLiteModelRun(
 
 			var data unsafe.Pointer
 			var size C.size_t
-			ret = int(C.vaccel_tflite_tensor_take_data(outTensorSlice[i], &data, &size)) //nolint:gocritic
+			ret = int(C.vaccel_tflite_tensor_take_data(outTensorSlice[i], &data, &size))
 			if ret != OK {
 				fmt.Println("Could not take data from output C tensor")
 				return ret, uint8(cStatus)
@@ -328,6 +319,6 @@ func TFLiteModelRun(
 }
 
 func TFLiteModelUnload(sess *Session, model *Resource) int {
-	err := int(C.vaccel_tflite_model_unload(sess.cSess, model.cRes)) //nolint:gocritic
+	err := int(C.vaccel_tflite_model_unload(sess.cSess, model.cRes))
 	return err
 }

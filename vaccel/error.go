@@ -2,9 +2,7 @@
 
 package vaccel
 
-/*
-#include <errno.h>
-*/
+// #include <errno.h>
 import "C"
 
 const (

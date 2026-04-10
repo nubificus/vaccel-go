@@ -2,13 +2,7 @@
 
 package vaccel
 
-/*
-
-#cgo pkg-config: vaccel
-#cgo LDFLAGS: -lvaccel -ldl
-#include <vaccel.h>
-
-*/
+// #include <vaccel/ops/genop.h>
 import "C"
 
 func Genop(sess *Session, read *ArgList, write *ArgList) int {
@@ -18,7 +12,7 @@ func Genop(sess *Session, read *ArgList, write *ArgList) int {
 	cNrRead := C.int(read.cList.size)
 	cNrWrite := C.int(write.cList.size)
 
-	cRet := C.vaccel_genop(sess.cSess, cRead, cNrRead, cWrite, cNrWrite) //nolint:gocritic
+	cRet := C.vaccel_genop(sess.cSess, cRead, cNrRead, cWrite, cNrWrite)
 	return int(cRet)
 
 }
