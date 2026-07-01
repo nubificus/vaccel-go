@@ -78,7 +78,7 @@ jobs:
           permission-contents: read
 
       - name: Checkout .github directory
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github
           repository: ${{ inputs.actions-repo }}
@@ -156,7 +156,7 @@ jobs:
           permission-contents: read
 
       - name: Checkout .github directory
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           sparse-checkout: .github
           repository: ${{ inputs.actions-repo }}
